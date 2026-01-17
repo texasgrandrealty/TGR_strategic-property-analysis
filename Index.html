@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>Strategic Market Position Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-montserrat { font-family: 'Montserrat', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin: auto; height: 350px; }
+        
+        .nav-btn {
+            padding: 0.75rem 1.5rem; font-size: 0.7rem; font-weight: 600; 
+            color: #94A3B8; transition: all 0.2s;
+            border-bottom: 2px solid transparent; white-space: nowrap;
+            text-transform: uppercase; letter-spacing: 0.15em;
+            flex-shrink: 0;
+        }
+        .nav-btn:hover { color: #1D4ED8; }
+        .nav-btn.active { color: #1D4ED8; border-bottom-color: #1D4ED8; font-weight: 700; }
+        
+        .sub-nav-btn {
+            padding: 0.4rem 1rem; font-size: 0.7rem; font-weight: 600;
+            background-color: #F8FAFC; color: #64748B; border: 1px solid #E2E8F0;
+            border-radius: 9999px; cursor: pointer; transition: all 0.2s;
+        }
+        .sub-nav-btn:hover { background-color: #F1F5F9; color: #1E293B; }
+        .sub-nav-btn.active { background-color: #1E293B; color: white; border-color: #1E293B; }
+
+        /* Navigation Refinements */
+        .nav-tabs-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            row-gap: 1rem;
+            column-gap: 0.5rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs-container {
+                flex-wrap: nowrap;
+                justify-content: flex-start;
+                overflow-x: auto;
+                scroll-behavior: smooth;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 5px;
+                padding-right: 40px; /* Space for fade */
+                mask-image: linear-gradient(to right, black 85%, transparent 100%);
+                -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+            }
+
+            .nav-tabs-container::-webkit-scrollbar {
+                display: none;
+            }
+            .nav-tabs-container {
+                -ms-overflow-style: none;  /* IE and Edge */
+                scrollbar-width: none;  /* Firefox */
+            }
+
+            .nav-btn {
+                padding-left: 1.5rem !important;
+                padding-right: 1.5rem !important;
+                flex-shrink: 0;
+            }
+        }
+
+        .page-section { @apply bg-white shadow-sm rounded-xl p-6 md:p-8 border border-slate-100; }
+        .kpi-card { @apply bg-white shadow-sm rounded-xl p-6 flex flex-col items-start border-t-4 border-blue-600 transition-transform duration-300 hover:scale-105; }
+        .kpi-title { @apply text-xs font-bold text-slate-500 uppercase tracking-[0.15em] mb-2; }
+        .kpi-value { @apply text-3xl font-black text-slate-900; }
+        .kpi-subtext { @apply text-sm font-medium text-blue-600 mt-1; }
+        
+        .section-header { @apply text-xl font-black text-slate-900 uppercase tracking-tight mb-2; }
+        .section-underline { @apply w-12 h-1 bg-blue-500 mb-6; }
+        
+        .data-table thead { @apply text-xs text-white uppercase bg-slate-800; }
+        .data-table th, .data-table td { @apply p-4 border-b border-gray-100; }
+        
+        .summary-bold { font-weight: 700; }
+        .summary-red { color: #dc2626; font-weight: 700; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-800 min-h-screen">
+
+    <script>
+        // CENTRALIZED DATA OBJECT
+        const propertyData = {
+            address: "128 N Osborn Street, Alba, TX 75410",
+            price: 349999,
+            beds: 3,
+            baths: 2,
+            sqft: 1700,
+            lotSize: "0.48 AC",
+            yearBuilt: "1974 / 2025 Total Remodel",
+            imagePath: "./front-view.jpg",
+            assetName: "Osborn Gateway Residence",
+            pps: 205.88,
+            introVideoID: "fj_mo819gi0", // Replace with actual YouTube ID
+            
+            // Strategic Pricing (Roadmap)
+            roadmap: {
+                phase1: 349999,
+                phase2: 324900,
+                phase3: 309900,
+                d30: 324900,
+                d60: 309900
+            },
+
+            // Local Market Data with Trends
+            localMarket: {
+                medianListPrice: { value: 318800, trend: 'up', change: '+5.91% MoM' },
+                monthsSupply: { value: 4.4, status: 'Tightening Supply' },
+                medianDOM: { value: 96, trend: 'up', change: 'Market Baseline' },
+                ppsf: { value: 192, trend: 'up', change: 'Market Avg' },
+                activeListings: { value: 872, trend: 'down', change: 'Down 51' },
+                newListings: { value: 131, trend: 'down', change: 'Down 8' },
+                pendingListings: { value: 746, trend: 'down', change: 'Down 44' },
+                medianHomeSize: 1896,
+                inventoryYoY: 42.4,
+                areaSupply: 18
+            },
+
+            // 3-2-1 Buydown Data
+            buydown: {
+                contribution: 24150,
+                downPayment: 89980,
+                loanAmount: 359920,
+                indexedRate: "6.45%", // Can be "6.45%" or 6.45
+                year1: { rate: "3.11%", pay: 1539, save: 728 },
+                year2: { rate: "4.11%", pay: 1741, save: 526 },
+                year3: { rate: "5.11%", pay: 1957, save: 310 },
+                final: { pay: 2267 }
+            },
+
+            // Owner Finance Data
+            ownerFinance: {
+                downPayment: 20000,
+                monthlyPay: 3305.54,
+                totalRevenue: 677154,
+                balloon: 406234,
+                interestRate: "8.5%", // Can be "8.5%" or 0.085 or 8.5
+                standardNet: 415000 
+            },
+
+            // Market Rates
+            marketRates: {
+                current: "6.06%",
+                rangeLow: "6.13%",
+                rangeHigh: "6.38%",
+                fedCutProb: "72%",
+                unemployment: "4.4%",
+                adp: "41k"
+            }
+        };
+
+        // HELPERS
+        const fCurrency = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(num);
+        const fCurrencyPrecise = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(num);
+        const fNumber = (num) => new Intl.NumberFormat('en-US').format(num);
+        const parseRate = (val) => {
+            if (typeof val === 'string') return parseFloat(val.replace('%', ''));
+            return val;
+        };
+        const fRate = (val) => {
+            const num = parseRate(val);
+            return (num > 1 ? num : num * 100).toFixed(2) + '%';
+        };
+    </script>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Sticky Glass-morphism Header (Asset Briefing Bar) -->
+        <header class="sticky top-0 z-[100] bg-white/90 backdrop-blur-md border-b border-slate-200 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6">
+                <!-- Hero Address (Left Side) -->
+                <div>
+                    <h1 id="header-address" class="text-2xl font-black text-slate-900 uppercase tracking-tighter leading-none mb-2">
+                        128 N Osborn Street, Alba, TX 75410
+                    </h1>
+                    <p class="text-[10px] tracking-[0.2em] font-bold text-blue-600 uppercase">
+                        Strategic Market Report
+                    </p>
+                </div>
+
+                <!-- Spec Ribbon (Center/Right) -->
+                <div class="flex flex-wrap items-center gap-6 md:gap-10 border-l-0 xl:border-l xl:pl-10 border-slate-200">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Year</span>
+                        <span id="header-year" class="text-sm font-bold text-slate-800">1985/2025</span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-100 hidden md:block"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Size</span>
+                        <span id="header-sqft" class="text-sm font-bold text-slate-800">1,700 SF</span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-100 hidden md:block"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Beds</span>
+                        <span id="header-beds" class="text-sm font-bold text-slate-800">3</span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-100 hidden md:block"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Baths</span>
+                        <span id="header-baths" class="text-sm font-bold text-slate-800">2</span>
+                    </div>
+                    <div class="w-px h-8 bg-slate-100 hidden md:block"></div>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lot</span>
+                        <span id="header-lot" class="text-sm font-bold text-slate-800">0.50 AC</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sleek Underline Navigation Sub-bar -->
+            <nav class="mt-8 pt-2 border-t border-slate-50">
+                <div class="nav-tabs-container">
+                    <button id="btn-summary" class="nav-btn active" onclick="showTab('summary')">Executive Summary</button>
+                    <button id="btn-property" class="nav-btn" onclick="showTab('property')">Property</button>
+                    <button id="btn-local" class="nav-btn" onclick="showTab('local')">Local Market</button>
+                    <button id="btn-comps" class="nav-btn" onclick="showTab('comps')">Comps</button>
+                    <button id="btn-metrics" class="nav-btn" onclick="showTab('metrics')">Metrics</button>
+                    <button id="btn-rpr" class="nav-btn" onclick="showTab('rpr')">RPR Insights</button>
+                    <button id="btn-option1" class="nav-btn" onclick="showTab('option1')">Roadmap</button>
+                    <button id="btn-campaign" class="nav-btn" onclick="showTab('campaign')">Campaign Strategy</button>
+                    <button id="btn-rates" class="nav-btn" onclick="showTab('rates')">Rates</button>
+                    <button id="btn-liquidity" class="nav-btn" onclick="showTab('liquidity')">Liquidity</button>
+                    <button id="btn-options" class="nav-btn" onclick="showTab('options')">Incentives</button>
+                    <button id="btn-option3" class="nav-btn" onclick="showTab('option3')">Financing</button>
+                    <button id="btn-option2" class="nav-btn" onclick="showTab('option2')">Buydown</button>
+                    <button id="btn-search" class="nav-btn" onclick="window.open('https://www.texasgrandrealty.com/', '_blank')">Search Properties</button>
+                </div>
+            </nav>
+        </header>
+
+        <main class="mt-12 md:mt-16 lg:mt-20 mb-20">
+            <div id="tab-summary" class="tab-pane">
+                <div class="max-w-6xl mx-auto px-4">
+                    <!-- Seller Strategy Briefing Header -->
+                    <div class="text-center mb-12">
+                        <h2 class="text-4xl font-black text-slate-900 uppercase tracking-tighter mb-2">Executive Brief: 128 N Osborn Gateway</h2>
+                        <p class="text-blue-600 font-bold tracking-widest uppercase text-xs">Strategic Market Analysis | 2026 Executive Summary</p>
+                    </div>
+
+                    <!-- Executive Video Message -->
+                    <div class="mb-20 px-4 md:px-[50px] flex flex-col items-center">
+                        <h3 class="text-lg font-black text-slate-900 uppercase tracking-[0.2em] mb-8 font-montserrat text-center">Executive Brief: 128 N Osborn Gateway</h3>
+                        <div class="w-full md:w-1/2 max-w-2xl mx-auto">
+                            <div class="relative w-full pb-[56.25%] rounded-3xl overflow-hidden shadow-2xl border border-slate-200 bg-slate-900 ring-8 ring-slate-100">
+                                <iframe 
+                                    id="intro-video"
+                                    class="absolute top-0 left-0 w-full h-full"
+                                    src="" 
+                                    title="Executive Briefing" 
+                                    frameborder="0" 
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                                    referrerpolicy="strict-origin-when-cross-origin"
+                                    sandbox="allow-forms allow-scripts allow-pointer-lock allow-same-origin allow-presentation"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Pricing Roadmap Section -->
+                    <div class="mb-16">
+                        <h3 class="section-header">Strategic Pricing Roadmap</h3>
+                        <div class="section-underline"></div>
+                        <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-sm">
+                            <table class="w-full text-sm text-left">
+                                <thead class="bg-slate-900 text-white uppercase text-[10px] font-black tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4">Phase</th>
+                                        <th class="px-6 py-4">Target Price</th>
+                                        <th class="px-6 py-4">Market Pivot Trigger</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100 bg-white">
+                                    <tr>
+                                        <td class="px-6 py-4 font-bold text-slate-900">Phase 1: Market Test</td>
+                                        <td class="px-6 py-4 font-black text-blue-600">$349,999</td>
+                                        <td class="px-6 py-4 text-slate-500">Condition Premium / Seller Target</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 font-bold text-slate-900">Phase 2: Expert Pivot</td>
+                                        <td class="px-6 py-4 font-black text-slate-800">$324,900</td>
+                                        <td class="px-6 py-4 text-slate-500">High-Interest Reset (Day 21-30)</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4 font-bold text-slate-900">Phase 3: Liquidity Floor</td>
+                                        <td class="px-6 py-4 font-black text-red-600">$309,900</td>
+                                        <td class="px-6 py-4 text-slate-500">Appraisal Floor / Maximum Velocity</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Listing Preview & Market Intelligence -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+                        <!-- Left: Listing Preview & Marketing Strategy -->
+                        <div class="space-y-8">
+                            <div class="space-y-4">
+                                <h3 class="section-header">Listing Concept Preview</h3>
+                                <div class="section-underline"></div>
+                                <div class="bg-slate-900 text-white p-8 rounded-3xl shadow-2xl relative overflow-hidden ring-4 ring-blue-500/20">
+                                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                                        <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 4.7l6 5.4V18H6v-4.9l6-5.4z"/></svg>
+                                    </div>
+                                    <h4 class="text-blue-400 font-black uppercase tracking-widest text-xs mb-4">Market-Facing Description</h4>
+                                    <p class="text-xl font-bold leading-tight mb-6">
+                                        "Gateway to Lake Fork: The ultimate turn-key residence just 3.8 miles from world-class fishing and boat launches."
+                                    </p>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center gap-2 text-sm text-slate-300">
+                                            <span class="text-blue-500">✓</span> 1,700 SF Expanded Floorplan
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm text-slate-300">
+                                            <span class="text-blue-500">✓</span> 0.50 AC Corner Lot (RV/Boat Ready)
+                                        </div>
+                                        <div class="flex items-center gap-2 text-sm text-slate-300">
+                                            <span class="text-blue-500">✓</span> Total 2025 Systems Overhaul
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                <h3 class="section-header text-slate-800">Our Marketing Strategy</h3>
+                                <div class="section-underline"></div>
+                                <div class="bg-blue-50/50 border border-blue-100 p-6 rounded-2xl">
+                                    <ul class="space-y-4">
+                                        <li class="flex items-start gap-3">
+                                            <span class="text-blue-600 font-black">»</span>
+                                            <p class="text-sm text-slate-700 font-medium">Professional Digital Dashboarding for transparent seller-buyer alignment.</p>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <span class="text-blue-600 font-black">»</span>
+                                            <p class="text-sm text-slate-700 font-medium">Targeted Social Syndication to Lake Fork Enthusiasts and regional anglers.</p>
+                                        </li>
+                                        <li class="flex items-start gap-3">
+                                            <span class="text-blue-600 font-black">»</span>
+                                            <p class="text-sm text-slate-700 font-medium">Phase-Based Pricing Logic to capture peak liquidity without stagnation.</p>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: 2026 Market Intelligence -->
+                        <div class="space-y-4">
+                            <h3 class="section-header text-blue-700">2026 Market Intelligence</h3>
+                            <div class="section-underline"></div>
+                            <ul class="space-y-6">
+                                <li class="flex gap-4">
+                                    <div class="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">1</div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900">Inventory Alert</h4>
+                                        <p class="text-sm text-slate-600 leading-relaxed"><strong class="text-blue-700">872 Active Listings (Down 5.5%)</strong> and <strong class="text-slate-900">131 New Listings (Down 5.7%)</strong> showing tightening regional supply levels.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-4">
+                                    <div class="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">2</div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900">Price Velocity</h4>
+                                        <p class="text-sm text-slate-600 leading-relaxed"><strong class="text-slate-900">Median List Price: $318.8k</strong> with a strong <strong class="text-blue-700">+5.91% Month-over-Month Growth</strong> trend.</p>
+                                    </div>
+                                </li>
+                                <li class="flex gap-4">
+                                    <div class="flex-shrink-0 w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-black">3</div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900">Market Speed</h4>
+                                        <p class="text-sm text-slate-600 leading-relaxed"><strong class="text-slate-900">96 Median Days on Market</strong> and <strong class="text-slate-900">4.4 Months of Inventory</strong> establishing the timeline for the Strategic Pricing Roadmap.</p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Expert Note Conclusion -->
+                    <div class="page-section bg-slate-900 text-white p-8 rounded-3xl mb-16 border-l-8 border-blue-500">
+                        <div class="flex items-center gap-6">
+                            <div class="text-3xl">🖋️</div>
+                            <p class="text-lg font-medium leading-relaxed italic">
+                                "This roadmap respects the $350k target while mathematically securing an appraisal-supported closing in the $315k range."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-metrics" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">Strategic Pricing & Velocity Snapshot</h2>
+                        <p class="text-slate-500 font-medium italic">"Implementing a compressed 45-day reduction schedule to force market urgency and capture Q1 liquidity."</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                        <!-- Card 1: Initial List -->
+                        <div class="kpi-card border-blue-600">
+                            <span class="kpi-title">Initial List Price</span>
+                            <span id="metrics-initial-price" class="kpi-value">$349,999</span>
+                        </div>
+                        <!-- Card 2: Target Sales Timeline -->
+                        <div class="kpi-card border-red-600">
+                            <span class="kpi-title text-red-500">Target Sales Timeline</span>
+                            <span class="kpi-value text-red-600">90 Days</span>
+                        </div>
+                        <!-- Card 3: Price Floor -->
+                        <div class="kpi-card border-blue-500">
+                            <span class="kpi-title text-blue-500">Price Floor (Day 45)</span>
+                            <span class="kpi-value text-blue-600">$309,900</span>
+                        </div>
+                        <!-- Card 4: PPSF Benchmark -->
+                        <div class="kpi-card border-slate-800">
+                            <span class="kpi-title">PPSF Benchmark</span>
+                            <span id="metrics-ppsf" class="kpi-value">$205.88</span>
+                        </div>
+                    </div>
+
+                    <div class="page-section">
+                        <h3 class="section-header text-center">Aggressive Pricing Trajectory ($/SqFt)</h3>
+                        <div class="section-underline mx-auto"></div>
+                        <div class="chart-container">
+                            <canvas id="priceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-property" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-black text-blue-900 uppercase tracking-tight mb-2 font-montserrat">Property Specification Analysis</h2>
+                        <p class="text-slate-500 font-medium italic">Comprehensive asset overview and verified modernization details.</p>
+                    </div>
+
+                    <!-- Hero Image Slot -->
+                    <div class="mb-12 max-w-5xl mx-auto">
+                        <div class="relative w-full rounded-xl overflow-hidden shadow-xl" style="height: 450px; background: #f3f4f6; display: flex; align-items: center; justify-content: center; position: relative;">
+                            <!-- Fallback Text Overlay -->
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0">
+                                <div class="text-6xl mb-4 opacity-20">🖼️</div>
+                                <span class="text-sm font-black uppercase tracking-[0.3em] text-center px-6">128 N Osborn Gateway - Photo Pending</span>
+                            </div>
+                            <!-- Actual Hero Image -->
+                            <img src='property-hero.jpg' alt='128 N Osborn' style='width: 100%; height: 100%; object-fit: cover; position: relative; z-10; display: none;' onload='this.style.display="block"; this.parentElement.style.background="none"; this.parentElement.querySelector("div").style.display="none"'>
+                        </div>
+                    </div>
+
+                    <!-- Hero Grid: Top Level Stats (3-Column) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-sm text-center flex flex-col justify-center items-center transition-all hover:border-blue-500 hover:shadow-md">
+                            <span class="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-3">Living Area</span>
+                            <span class="text-4xl font-black text-slate-900 font-montserrat tracking-tighter">1,700 SF</span>
+                        </div>
+                        <div class="bg-slate-50 p-8 rounded-2xl border border-slate-200 shadow-sm text-center flex flex-col justify-center items-center transition-all hover:border-blue-500 hover:shadow-md">
+                            <span class="text-[10px] font-black text-blue-900 uppercase tracking-[0.2em] mb-3">Lot Size</span>
+                            <span class="text-4xl font-black text-slate-900 font-montserrat tracking-tighter">0.48 AC</span>
+                        </div>
+                        <div class="bg-blue-900 p-8 rounded-2xl shadow-xl text-center flex flex-col justify-center items-center relative overflow-hidden ring-4 ring-blue-500/20">
+                            <div class="absolute inset-0 bg-blue-600/5"></div>
+                            <span class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mb-3 relative z-10">Asset Status</span>
+                            <span class="text-2xl font-black text-white font-montserrat uppercase relative z-10 leading-none">2025 Reno</span>
+                        </div>
+                    </div>
+
+                    <!-- The Spec Grid: Secondary Data Block -->
+                    <div class="border border-slate-200 rounded-3xl p-8 bg-white shadow-sm mb-12">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-[0.3em] mb-8 text-center font-montserrat">Core Asset Data Matrix</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <!-- School District Card -->
+                            <div class="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-900 text-xl mb-4">🎓</div>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">School District</span>
+                                <span class="text-sm font-black text-blue-900 uppercase font-montserrat">Alba-Golden ISD</span>
+                            </div>
+
+                            <!-- Utilities Card -->
+                            <div class="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-900 text-xl mb-4">⚡</div>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Essential Utilities</span>
+                                <span class="text-xs font-black text-blue-900 uppercase font-montserrat leading-tight">City Water / Septic / Fiber</span>
+                            </div>
+
+                            <!-- Tax ID Card -->
+                            <div class="bg-slate-50 border border-slate-100 p-6 rounded-2xl flex flex-col items-center text-center">
+                                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-900 text-xl mb-4">📋</div>
+                                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Tax Info</span>
+                                <span class="text-sm font-black text-blue-900 uppercase font-montserrat">[Wood County R#]</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Map Slot -->
+                    <div class="mb-16 max-w-5xl mx-auto">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-[0.3em] mb-8 text-center font-montserrat">Location & Proximity</h3>
+                        <div class="rounded-3xl overflow-hidden shadow-2xl border border-slate-200">
+                            <iframe width='100%' height='400' style='border:0; border-radius:12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);' loading='lazy' allowfullscreen referrerpolicy='no-referrer-when-downgrade' src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3345.875323451234!2d-95.485123!3d32.792123!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864906f5c5555555%3A0x5555555555555555!2s128%20N%20Osborn%2C%20Alba%2C%20TX%2075410!5e0!3m2!1sen!2sus!4v1705445000000!5m2!1sen!2sus'></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Modernization Highlight -->
+                    <div class="page-section bg-slate-900 text-white shadow-2xl relative overflow-hidden border-b-8 border-blue-600 mb-12">
+                        <div class="absolute top-0 right-0 p-12 opacity-10">
+                            <svg class="w-48 h-48" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h14v-8h3L12 3zm0 4.7l6 5.4V18H6v-4.9l6-5.4z"/></svg>
+                        </div>
+                        <div class="relative z-10">
+                            <h3 class="text-blue-400 font-black uppercase tracking-[0.2em] text-sm mb-4 font-montserrat">Verified 2025 Renovation Scope</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Full Systems</strong> All-new HVAC, Electrical, Plumbing & Roof.</p>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Modern Floorplan</strong> Complete 1,700 SF open-concept expansion.</p>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Custom Cabinetry</strong> Massive high-end kitchen & storage package.</p>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Luxury Baths</strong> Custom tile-work & deep relaxation tub.</p>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Outdoor Living</strong> New expansive front and back porch additions.</p>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <span class="text-blue-500 font-bold">✓</span>
+                                    <p class="text-sm text-slate-300 font-medium"><strong class="text-white block">Asset Security</strong> Large concrete driveway & RV/Boat parking.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3D Virtual Tour Section -->
+                    <div class="mb-16">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-[0.3em] mb-8 text-center font-montserrat">3D Virtual Immersion</h3>
+                        <div class="relative w-full max-w-5xl mx-auto">
+                            <!-- Cinema Frame -->
+                            <div class="bg-slate-900 p-1 md:p-2 rounded-[2rem] shadow-2xl border border-slate-800 relative">
+                                <!-- 3D Badge -->
+                                <div class="absolute top-6 left-6 z-20 px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest shadow-lg">
+                                    3D Tour
+                                </div>
+                                <!-- Aspect Ratio Container -->
+                                <div class="relative w-full overflow-hidden rounded-[1.5rem]" style="aspect-ratio: 16 / 9;">
+                                    <iframe width='100%' height='100%' src='https://my.matterport.com/show/?m=YOUR_ID_HERE' frameborder='0' allowfullscreen allow='xr-spatial-tracking' class="absolute top-0 left-0 w-full h-full"></iframe>
+                                </div>
+                            </div>
+                            <!-- CTA Caption -->
+                            <p class="mt-6 text-center text-slate-500 text-sm font-medium">
+                                Click the play button to enter the 3D Immersion. Use your mouse or touch screen to navigate every room.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-comps" class="tab-pane hidden">
+                <div class="page-section mx-4">
+                    <h3 class="text-2xl font-black text-slate-800 uppercase text-center mb-4 tracking-tight">Market Comparison Analysis</h3>
+                    
+                    <!-- Global RPR Link -->
+                    <div class="flex justify-center mb-8">
+                        <a href="https://www.narrpr.com/reports-v2/3301b700-8b0c-4530-b17b-bb435cf9abb8/pdf" target="_blank" class="flex items-center justify-center px-8 py-4 bg-blue-600 border border-blue-700 rounded-xl text-white font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg hover:shadow-blue-500/25 active:translate-y-1">
+                            <span class="mr-2">📄</span> View Source Data: RPR Market Evidence
+                        </a>
+                    </div>
+
+                    <!-- Market Pulse Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="bg-blue-50 border border-blue-100 p-6 rounded-2xl shadow-sm text-center">
+                            <h4 class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-2">Inventory Alert</h4>
+                            <div class="text-xl font-black text-slate-800">872 Active Listings</div>
+                            <div class="text-[10px] font-bold text-red-500 uppercase mt-1">Down 5.5% | 131 New (Down 5.7%)</div>
+                        </div>
+                        <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl shadow-sm text-center">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Price Velocity</h4>
+                            <div class="text-xl font-black text-slate-800">Median List Price: $318.8k</div>
+                            <div class="text-[10px] font-bold text-green-600 uppercase mt-1">+5.91% Month-over-Month Growth</div>
+                        </div>
+                        <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-lg text-center">
+                            <h4 class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Market Speed</h4>
+                            <div class="text-xl font-black text-white">96 Median Days on Market</div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase mt-1">4.4 Months of Inventory</div>
+                        </div>
+                    </div>
+
+                    <!-- Sub-Navigation -->
+                    <div class="flex flex-wrap justify-center gap-2 mb-8">
+                        <button class="sub-nav-btn active" onclick="showSubTab('comps', 'validated-sales')">1. Validated Sales Analysis</button>
+                        <button class="sub-nav-btn" onclick="showSubTab('comps', 'active-competition')">2. Active Market Competition</button>
+                        <button class="sub-nav-btn" onclick="showSubTab('comps', 'strategic-gap')">3. Strategic Value Gap</button>
+                    </div>
+
+                    <!-- Validated Sales Analysis Sub-Tab -->
+                    <div id="sub-validated-sales" class="sub-tab-pane">
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-sm text-left table-fixed">
+                                <thead class="bg-slate-900 text-white uppercase text-[10px] font-black tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4 w-[40%]">Address</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">SqFt</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">Status</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">Price</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">$/SqFt</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    <tr class="bg-blue-50 font-bold text-blue-900">
+                                        <td class="px-6 py-4">128 N Osborn</td>
+                                        <td class="px-6 py-4 text-center">1,700 SF</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$349,999</td>
+                                        <td class="px-6 py-4 text-right">$205.88/SF</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">355 Rs CR 3503</td>
+                                        <td class="px-6 py-4 text-center">1,850</td>
+                                        <td class="px-6 py-4 text-center">Closed</td>
+                                        <td class="px-6 py-4 text-right">$390,000</td>
+                                        <td class="px-6 py-4 text-right">$210.81</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">148 CR 2461</td>
+                                        <td class="px-6 py-4 text-center">1,620</td>
+                                        <td class="px-6 py-4 text-center">Closed</td>
+                                        <td class="px-6 py-4 text-right">$335,000</td>
+                                        <td class="px-6 py-4 text-right">$206.79</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">2095 CR 1416</td>
+                                        <td class="px-6 py-4 text-center">1,550</td>
+                                        <td class="px-6 py-4 text-center">Closed</td>
+                                        <td class="px-6 py-4 text-right">$312,000</td>
+                                        <td class="px-6 py-4 text-right">$201.29</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">555 Rs CR 4510</td>
+                                        <td class="px-6 py-4 text-center">1,480</td>
+                                        <td class="px-6 py-4 text-center">Closed</td>
+                                        <td class="px-6 py-4 text-right">$298,000</td>
+                                        <td class="px-6 py-4 text-right">$201.35</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Active Market Competition Sub-Tab -->
+                    <div id="sub-active-competition" class="sub-tab-pane hidden">
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-sm text-left table-fixed">
+                                <thead class="bg-slate-900 text-white uppercase text-[10px] font-black tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4 w-[40%]">Address</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">SqFt</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">Status</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">Price</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">$/SqFt</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    <tr class="bg-blue-50 font-bold text-blue-900">
+                                        <td class="px-6 py-4">128 N Osborn</td>
+                                        <td class="px-6 py-4 text-center">1,700 SF</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$349,999</td>
+                                        <td class="px-6 py-4 text-right">$205.88/SF</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">439 PR 5440</td>
+                                        <td class="px-6 py-4 text-center">1,876</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$377,000</td>
+                                        <td class="px-6 py-4 text-right">$200.96</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">2271 Hideaway</td>
+                                        <td class="px-6 py-4 text-center">2,090</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$462,000</td>
+                                        <td class="px-6 py-4 text-right">$221.05</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">269 E Holley St</td>
+                                        <td class="px-6 py-4 text-center">1,750</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$359,000</td>
+                                        <td class="px-6 py-4 text-right">$205.14</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Value Gap Sub-Tab -->
+                    <div id="sub-strategic-gap" class="sub-tab-pane hidden">
+                        <div class="overflow-x-auto rounded-xl border border-gray-200">
+                            <table class="w-full text-sm text-left table-fixed">
+                                <thead class="bg-slate-900 text-white uppercase text-[10px] font-black tracking-widest">
+                                    <tr>
+                                        <th class="px-6 py-4 w-[40%]">Address</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">SqFt</th>
+                                        <th class="px-6 py-4 w-[15%] text-center">Status</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">Price</th>
+                                        <th class="px-6 py-4 w-[15%] text-right">$/SqFt</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 bg-white">
+                                    <tr class="bg-blue-50 font-bold text-blue-900">
+                                        <td class="px-6 py-4">128 N Osborn</td>
+                                        <td class="px-6 py-4 text-center">1,700 SF</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$349,999</td>
+                                        <td class="px-6 py-4 text-right">$205.88/SF</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">104 Boone St</td>
+                                        <td class="px-6 py-4 text-center">1,450</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$299,000</td>
+                                        <td class="px-6 py-4 text-right">$206.21</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-6 py-4">371 CR 2311</td>
+                                        <td class="px-6 py-4 text-center">1,520</td>
+                                        <td class="px-6 py-4 text-center">Active</td>
+                                        <td class="px-6 py-4 text-right">$318,000</td>
+                                        <td class="px-6 py-4 text-right">$209.21</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Footer Note -->
+                    <div class="mt-8 text-center">
+                        <p class="text-xs text-slate-400 font-medium italic">
+                            * Subject Property value justified by 2025 Total Remodel status and expanded 1,700 SF floorplan.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-rates" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <!-- Hero Header -->
+                    <div class="bg-blue-900 text-white p-12 rounded-3xl mb-10 text-center border-l-8 border-blue-400 shadow-2xl">
+                        <h2 class="text-4xl font-black uppercase italic mb-4 tracking-tighter">
+                            GSE MBS BREAKOUT: <span class="text-blue-400">3-YEAR LOWS</span>
+                        </h2>
+                        <p class="text-blue-200 text-xl font-bold italic">
+                            "Policy Over Data: The $200B Magic Armor."
+                        </p>
+                    </div>
+
+                    <!-- Key Talking Points -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
+                        <div class="page-section border-t-4 border-blue-500">
+                            <h3 class="text-lg font-black text-slate-800 uppercase mb-4">MBS Demand Spike</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                The market broke a 4-month range (<span id="rates-range" class="text-blue-700 font-black">6.13% - 6.38%</span>) following President Trump’s $200B GSE bond-buying directive. Increased demand for MBS has pushed yields to <span id="rates-low-label" class="text-blue-700 font-black">3-YEAR LOWS</span>.
+                            </p>
+                        </div>
+                        <div class="page-section border-t-4 border-blue-500">
+                            <h3 class="text-lg font-black text-slate-800 uppercase mb-4">Economic Shield</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                While Tuesday’s CPI (forecast 0.3%) and Wednesday’s PPI add volatility, the new bond-buying program acts as <strong class="text-blue-800">"Magic Armor"</strong> protecting current pricing from adverse data cycles.
+                            </p>
+                        </div>
+                        <div class="page-section border-t-4 border-blue-500">
+                            <h3 class="text-lg font-black text-slate-800 uppercase mb-4">The Fed Strategy</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                January cut odds are near zero. Market focus has shifted to a <span id="rates-fed-prob" class="text-blue-700 font-black">72%</span> probability for a June 25bps cut. The window of opportunity is <strong class="text-slate-800 uppercase">NOW</strong>, not later.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Rate Chart Section -->
+                    <div class="page-section mb-10">
+                        <h3 class="text-xl font-black text-center text-slate-700 uppercase mb-8">MBS Rate Breakout: 4-Month Range Exit</h3>
+                        <div class="chart-container">
+                            <canvas id="rateChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Jobs vs Policy Card -->
+                    <div class="bg-slate-50 border border-slate-200 p-8 rounded-2xl mb-8 shadow-inner">
+                        <div class="flex flex-col md:flex-row items-center gap-8">
+                            <div class="text-4xl">📊</div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-800 uppercase mb-2">Jobs vs Policy: The Real Driver</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed">
+                                    Despite the unemployment rate ticking down to <span id="rates-unemployment" class="font-bold text-slate-800">4.4%</span> and ADP coming in at <span id="rates-adp" class="font-bold text-slate-800">41k</span>, these traditional metrics have been eclipsed. The <strong class="text-blue-700">GSE Policy</strong> is the real engine behind the current rate rally, providing a synthetic floor for mortgage pricing regardless of employment data.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tax Strategy Card -->
+                    <div class="bg-blue-50 border border-blue-200 p-8 rounded-2xl mb-12 shadow-sm">
+                        <div class="flex flex-col md:flex-row items-center gap-8">
+                            <div class="text-4xl">🏦</div>
+                            <div>
+                                <h3 class="text-xl font-black text-slate-800 uppercase mb-2">Tax Advantage: Alba-Golden ISD</h3>
+                                <p class="text-slate-600 text-sm leading-relaxed">
+                                    Alba-Golden ISD Tax Rate: <strong class="text-blue-700">0.78</strong> - Saving <strong class="text-slate-900">~$400/mo</strong> vs Suburban MUD districts.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- External Links -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <a href="https://www.mortgagenewsdaily.com/" target="_blank" class="flex items-center justify-center p-5 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg border-b-4 border-blue-800 active:border-b-0 active:translate-y-1">
+                            View Mortgage News Daily Analysis
+                        </a>
+                        <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="flex items-center justify-center p-5 bg-slate-800 text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-lg border-b-4 border-slate-950 active:border-b-0 active:translate-y-1">
+                            CME FedWatch Tool
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-local" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-black text-slate-900 uppercase tracking-tight mb-2">Alba-Lake Fork Area Market Update</h2>
+                        <p class="text-slate-500 font-medium italic">Live data insights from KCM and regional market activity for the 75410 / Lake Fork corridor.</p>
+                    </div>
+
+                    <!-- Metrics Header: 4-Column Horizontal Row -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+                        <!-- Col 1: Median List Price -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center">
+                            <span class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Median List Price</span>
+                            <span class="block text-[1.1rem] font-black text-slate-900">$318,800</span>
+                            <span class="text-[0.7rem] font-bold text-green-600 uppercase">+5.91% Growth</span>
+                        </div>
+                        <!-- Col 2: Median DOM -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center flex flex-col justify-center">
+                            <span class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Median DOM</span>
+                            <span class="block text-[1.1rem] font-black text-slate-900">96 Days</span>
+                        </div>
+                        <!-- Col 3: Supply -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm text-center flex flex-col justify-center">
+                            <span class="block text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest mb-1">Supply</span>
+                            <span class="block text-[1.1rem] font-black text-slate-900">4.4 Months</span>
+                        </div>
+                        <!-- Col 4: Price/SqFt -->
+                        <div class="bg-slate-900 p-4 rounded-xl shadow-lg text-center flex flex-col justify-center">
+                            <span class="block text-[0.8rem] font-bold text-blue-400 uppercase tracking-widest mb-1">Price/SqFt</span>
+                            <span class="block text-[1.1rem] font-black text-white">$192 <span class="text-slate-500 mx-1">/</span> <span class="text-blue-400">$205</span></span>
+                            <span class="text-[0.6rem] font-bold text-slate-500 uppercase">Market vs Subject</span>
+                        </div>
+                    </div>
+
+                    <!-- Market Dynamics & Outcome Analysis Section -->
+                    <div class="mb-16">
+                        <h3 class="section-header text-center">Market Dynamics & Outcome Analysis</h3>
+                        <div class="section-underline mx-auto"></div>
+                        <div class="page-section">
+                            <!-- Flexbox Wrapper for side-by-side charts -->
+                            <div class="flex flex-col md:flex-row justify-around flex-wrap gap-12 py-8">
+                                
+                                <!-- Chart 1 Container: Supply Velocity -->
+                                <div class="flex flex-col items-center w-full md:w-[45%]">
+                                    <div class="relative w-56 h-56 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-500 hover:scale-105 mb-6" 
+                                         style="background: conic-gradient(#3b82f6 0% 35%, #10b981 35% 65%, #f59e0b 65% 100%);">
+                                        <div class="absolute w-40 h-40 bg-white rounded-full flex flex-col items-center justify-center shadow-inner">
+                                            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Total Units</span>
+                                            <span class="text-xl font-black text-slate-900 tracking-tighter">2,502</span>
+                                        </div>
+                                    </div>
+                                    <h4 class="text-[0.9rem] font-black text-slate-900 uppercase mb-6">Supply Velocity</h4>
+                                    
+                                    <!-- Legend for Chart 1 -->
+                                    <div class="w-full space-y-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full bg-[#3b82f6]"></div>
+                                            <p class="text-[0.75rem] font-black text-slate-900 uppercase">Active Listings (872)</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full bg-[#10b981]"></div>
+                                            <p class="text-[0.75rem] font-black text-slate-900 uppercase">Pending Listings (746)</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full bg-[#f59e0b]"></div>
+                                            <p class="text-[0.75rem] font-black text-slate-900 uppercase">Sold (180 Days) (884)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Chart 2 Container: Listing Outcome -->
+                                <div class="flex flex-col items-center w-full md:w-[45%]">
+                                    <div class="relative w-56 h-56 rounded-full flex items-center justify-center shadow-2xl transition-transform duration-500 hover:scale-105 mb-6" 
+                                         style="background: conic-gradient(#10b981 0% 62%, #ef4444 62% 100%);">
+                                        <div class="absolute w-40 h-40 bg-white rounded-full flex flex-col items-center justify-center shadow-inner text-center px-4">
+                                            <span class="text-[0.6rem] font-black text-slate-400 uppercase tracking-widest mb-1">Outcome</span>
+                                            <span class="text-xs font-black text-slate-900 leading-tight uppercase">Success vs Failure</span>
+                                        </div>
+                                    </div>
+                                    <h4 class="text-[0.9rem] font-black text-slate-900 uppercase mb-6">Listing Outcomes</h4>
+
+                                    <!-- Legend for Chart 2 -->
+                                    <div class="w-full space-y-3 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full bg-[#10b981]"></div>
+                                            <p class="text-[0.75rem] font-black text-slate-900 uppercase">Sold Success (62%)</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-3 h-3 rounded-full bg-[#ef4444]"></div>
+                                            <p class="text-[0.75rem] font-black text-slate-900 uppercase">Failed Listings (38%)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dashboard Callouts -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl">
+                                    <h5 class="text-[0.7rem] font-black text-blue-600 uppercase tracking-widest mb-2">Negotiation Box</h5>
+                                    <p class="text-[0.85rem] text-slate-700 leading-relaxed font-medium">
+                                        <strong class="text-slate-900">Market Reality:</strong> Average Sale-to-List ratio is 93%. Pricing at $349,999 is strategically positioned to capture maximum buyer interest before the 30-day "Stale" window.
+                                    </p>
+                                </div>
+                                <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl">
+                                    <h5 class="text-[0.7rem] font-black text-red-600 uppercase tracking-widest mb-2">Insight Box</h5>
+                                    <p class="text-[0.85rem] text-slate-700 leading-relaxed font-medium">
+                                        <strong class="text-slate-900">Warning:</strong> 38% of listings in this market fail to sell. Success depends on following a precise Pricing Roadmap to avoid the "Expired" Red Zone.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+                        <!-- Left Column: Inventory Trends -->
+                        <div>
+                            <h3 class="section-header">Inventory Trends</h3>
+                            <div class="section-underline"></div>
+                            <div class="space-y-4">
+                                <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                                    <span class="text-[0.8rem] font-bold text-slate-500 uppercase tracking-widest">Active Listings</span>
+                                    <div class="text-right">
+                                        <span class="text-[1.1rem] font-black text-blue-600">872</span>
+                                        <span class="text-[0.7rem] font-bold text-red-500 uppercase ml-2">↓ Down 51</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                                    <span class="text-[0.8rem] font-bold text-slate-500 uppercase tracking-widest">New Listings</span>
+                                    <div class="text-right">
+                                        <span class="text-[1.1rem] font-black text-blue-600">131</span>
+                                        <span class="text-[0.7rem] font-bold text-red-500 uppercase ml-2">↓ Down 8</span>
+                                    </div>
+                                </div>
+                                <div class="flex justify-between items-center py-3 border-b border-slate-100">
+                                    <span class="text-[0.8rem] font-bold text-slate-500 uppercase tracking-widest">Pending Listings</span>
+                                    <div class="text-right">
+                                        <span class="text-[1.1rem] font-black text-blue-600">746</span>
+                                        <span class="text-[0.7rem] font-bold text-red-500 uppercase ml-2">↓ Down 44</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column: Asset Comparison -->
+                        <div>
+                            <h3 class="section-header">Asset Comparison</h3>
+                            <div class="section-underline"></div>
+                            <div class="page-section bg-slate-900 text-white shadow-2xl relative overflow-hidden">
+                                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-600/10 rounded-full"></div>
+                                <div class="space-y-6 relative">
+                                    <div class="flex justify-between border-b border-slate-800 pb-3">
+                                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Median Home Size</span>
+                                        <span class="text-[1.1rem] font-black text-white">1,896 SqFt</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-[0.8rem] font-bold text-slate-400 uppercase tracking-widest">Osborn Residence Asset</span>
+                                        <span class="text-[1.1rem] font-black text-blue-400">1,700 SqFt</span>
+                                    </div>
+                                </div>
+                                <p class="text-[0.8rem] text-slate-400 leading-relaxed mt-6">
+                                    128 N Osborn represents the premium <strong class="text-white">'Luxury New Build'</strong> tier. The valuation is fundamentally justified through energy-efficient 2025 construction and a strategic elevated half-acre position.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-liquidity" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <!-- Alert Header -->
+                    <div class="bg-red-50 border-l-8 border-red-600 p-8 rounded-r-2xl mb-10 shadow-sm">
+                        <h2 class="text-3xl font-black text-red-700 uppercase italic mb-2 tracking-tight">
+                            MARKET DYNAMICS: 75410 BUYER'S MARKET STATUS
+                        </h2>
+                        <p class="text-slate-700 font-bold leading-relaxed">
+                            Total inventory in Alba is up <span id="liq-inventory-yoy" class="text-red-600">42.4%</span> compared to last year. With <span id="liq-area-supply">18</span> months of supply currently on the market, accurate pricing is the only lever to ensure transaction velocity.
+                        </p>
+                    </div>
+
+                    <div class="page-section mb-10">
+                        <h3 class="section-header text-center">Days on Market (DOM) vs. Strategic Target</h3>
+                        <div class="section-underline mx-auto"></div>
+                        <div class="chart-container">
+                            <canvas id="cdomChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Inventory Saturation Card -->
+                    <div class="bg-slate-900 text-white p-10 rounded-3xl mb-10 shadow-2xl relative overflow-hidden">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-600/10 rounded-full"></div>
+                        <h3 class="text-blue-400 font-black uppercase tracking-widest text-sm mb-6 relative">The Cost of Stagnation</h3>
+                        <p class="text-slate-300 leading-relaxed mb-6 relative">
+                            As active listings grow, properties that exceed the 60-day threshold face a <strong class="text-white">5.6% average price reduction</strong> to recaptivate buyer interest. Executing a proactive strategy (3-2-1 Buydown or Phase 1 Price Reset) protects equity by avoiding the "stale listing" discount.
+                        </p>
+                    </div>
+
+                    <!-- Strategic Conclusion -->
+                    <div class="text-center py-8">
+                        <p class="text-xl font-black text-slate-800 uppercase tracking-tight">
+                            Strategic Mandate: Secure contract within the first <span class="text-blue-600">45 days</span> to leverage the current "Total Remodel" novelty and Jan 2026 rate breakout.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-options" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="page-section overflow-x-auto">
+                        <h3 class="section-header text-center">Incentive Strategy Matrix</h3>
+                        <div class="section-underline mx-auto"></div>
+                        <table class="w-full data-table">
+                            <thead>
+                                <tr class="bg-blue-600 text-white">
+                                    <th class="text-left">Strategy</th>
+                                    <th class="text-left">Buyer Benefit</th>
+                                    <th class="text-right">Seller Net Impact</th>
+                                    <th class="text-right">Est. Monthly P&I</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <!-- Row 1: Option 1 -->
+                                <tr>
+                                    <td class="font-black text-slate-800">Option 1: Price Reduction</td>
+                                    <td class="text-slate-600">Lower Purchase Price (<span id="matrix-o1-price">$309,900</span>)</td>
+                                    <td class="text-right"><span id="matrix-o1-impact" class="text-red-600 font-bold">-$40,000</span></td>
+                                    <td id="matrix-o1-pay" class="text-right font-bold text-slate-800">$2,185/mo</td>
+                                </tr>
+                                <!-- Row 2: Option 2 -->
+                                <tr class="bg-green-50/50">
+                                    <td class="font-black text-slate-800">
+                                        Option 2: 3-2-1 Buydown
+                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-black bg-green-100 text-green-800 uppercase tracking-tighter">Recommended</span>
+                                    </td>
+                                    <td class="text-green-700 font-bold">Year 1 Rate: <span id="matrix-o2-rate">3.11%</span></td>
+                                    <td class="text-right">
+                                        <span id="matrix-o2-impact" class="text-red-600 font-bold">-$24,150</span>
+                                        <br><span class="text-[10px] text-green-700 font-bold">(Saves Seller <span id="matrix-o2-savings">$15,850</span> vs Price Cut)</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span id="matrix-o2-pay" class="text-green-700 font-black text-xl">$1,539/mo</span>
+                                    </td>
+                                </tr>
+                                <!-- Row 3: Option 3 -->
+                                <tr>
+                                    <td class="font-black text-slate-800">Option 3: Owner Finance</td>
+                                    <td class="text-slate-600">Equity Access / No Bank Qualifying</td>
+                                    <td class="text-right text-blue-700 font-bold">Asset Hold / Monthly Cash Flow</td>
+                                    <td id="matrix-o3-pay" class="text-right font-bold text-slate-800">$2,717/mo</td>
+                                </tr>
+                        </tbody>
+                    </table>
+                    </div>
+
+                    <!-- Comparison Note Card -->
+                    <div class="mt-8 bg-blue-900 text-white p-8 rounded-2xl shadow-xl border-l-8 border-blue-400">
+                        <p class="text-lg leading-relaxed">
+                            <span class="font-black text-blue-400 uppercase tracking-widest mr-2 underline">Analysis:</span>
+                            <strong>Option 2 (Buydown)</strong> provides the buyer with <span id="matrix-analysis-savings" class="text-blue-400 font-black">$646/mo</span> in additional Day-1 savings compared to a $40,000 price cut, while preserving <span id="matrix-analysis-equity" class="text-blue-400 font-black">$15,850</span> of Seller Equity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-option1" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <!-- Progress Bar Section -->
+                    <div class="mb-12">
+                        <div class="flex justify-between items-end mb-4">
+                            <div>
+                                <h3 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Strategy Timeline</h3>
+                                <p class="text-2xl font-black text-slate-800 uppercase tracking-tight">Market Velocity Roadmap</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-black text-blue-600 uppercase">Current Position: Day 1</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden flex">
+                            <div class="bg-blue-600 h-full w-[1.1%]" title="Current Progress"></div>
+                        </div>
+                    </div>
+
+                    <!-- Phase Cards Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                        <!-- Phase 1: Market Exposure -->
+                        <div class="page-section rounded-2xl shadow-xl border-t-8 border-green-500 flex flex-col h-full relative overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                            <div class="absolute -right-8 -top-8 w-24 h-24 bg-green-50 rounded-full"></div>
+                            <div class="mb-6 relative">
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase tracking-widest">Active</span>
+                                <h4 class="text-lg font-black text-slate-800 uppercase mt-4">Phase 1: Market Exposure</h4>
+                                <p class="text-xs font-bold text-slate-400">Days 1 - 15</p>
+                            </div>
+                            <div class="mb-8 flex-grow">
+                                <span id="roadmap-p1-price" class="text-4xl font-black text-slate-800 block mb-2">$349,999</span>
+                                <p class="text-sm text-slate-600 leading-relaxed italic">"Maximize 'Like-New' premium and Jan 2026 rate breakout momentum."</p>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2: Tactical Reset -->
+                        <div class="page-section rounded-2xl shadow-xl border-t-8 border-yellow-500 flex flex-col h-full relative overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                            <div class="absolute -right-8 -top-8 w-24 h-24 bg-yellow-50 rounded-full"></div>
+                            <div class="mb-6 relative">
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-[10px] font-black rounded-full uppercase tracking-widest">Planned</span>
+                                <h4 class="text-lg font-black text-slate-800 uppercase mt-4">Phase 2: Tactical Reset</h4>
+                                <p class="text-xs font-bold text-slate-400">Days 16 - 45</p>
+                            </div>
+                            <div class="mb-8 flex-grow">
+                                <span id="roadmap-p2-price" class="text-4xl font-black text-slate-800 block mb-2">$324,900</span>
+                                <p class="text-sm text-slate-600 leading-relaxed italic">"Trigger 3-2-1 Buydown incentive to maintain high buyer engagement levels."</p>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3: Liquidity Event -->
+                        <div class="page-section rounded-2xl shadow-xl border-t-8 border-red-500 flex flex-col h-full relative overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                            <div class="absolute -right-8 -top-8 w-24 h-24 bg-red-50 rounded-full"></div>
+                            <div class="mb-6 relative">
+                                <span class="px-3 py-1 bg-red-100 text-red-700 text-[10px] font-black rounded-full uppercase tracking-widest">Contingency</span>
+                                <h4 class="text-lg font-black text-slate-800 uppercase mt-4">Phase 3: Liquidity Event</h4>
+                                <p class="text-xs font-bold text-slate-400">Day 45+</p>
+                            </div>
+                            <div class="mb-8 flex-grow">
+                                <span id="roadmap-p3-price" class="text-4xl font-black text-red-600 block mb-2">$309,900</span>
+                                <p class="text-sm text-slate-600 leading-relaxed italic">"Aggressive capture of remaining market share to avoid the 90+ day staleness cycle."</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Table: Technical Justification -->
+                    <div class="page-section bg-slate-50 border-slate-200">
+                        <h5 class="text-xs font-black text-slate-400 uppercase tracking-widest text-center mb-6">Technical Justification: PPSF Glidepath</h5>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-sm">
+                                <thead class="border-b border-slate-200">
+                                    <tr class="text-slate-400 uppercase text-[10px] font-black">
+                                        <th class="px-4 py-2 text-left">Phase</th>
+                                        <th class="px-4 py-2 text-center">List Price</th>
+                                        <th class="px-4 py-2 text-right">Price Per SqFt</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-slate-700">Phase 1 (Sellers' Target / Condition Premium)</td>
+                                        <td id="roadmap-table-p1-price" class="px-4 py-3 text-center text-slate-800">$349,999</td>
+                                        <td id="roadmap-table-p1-ppsf" class="px-4 py-3 text-right font-black text-blue-600">$205.88</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-slate-700">Phase 2 (Expert Pivot / High Interest)</td>
+                                        <td id="roadmap-table-p2-price" class="px-4 py-3 text-center text-slate-800">$324,900</td>
+                                        <td id="roadmap-table-p2-ppsf" class="px-4 py-3 text-right font-black text-slate-800">$191.12</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="px-4 py-3 font-bold text-slate-700">Phase 3 (Appraisal Floor / Maximum Velocity)</td>
+                                        <td id="roadmap-table-p3-price" class="px-4 py-3 text-center text-slate-800">$309,900</td>
+                                        <td id="roadmap-table-p3-ppsf" class="px-4 py-3 text-right font-black text-red-600">$182.29</td>
+                                    </tr>
+                                </tbody>
+                    </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-campaign" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4 py-12">
+                    <div class="text-center mb-16">
+                        <h2 class="text-4xl font-black text-blue-900 uppercase tracking-tight mb-4 font-montserrat">Campaign Strategy & Execution</h2>
+                        <p class="text-slate-500 font-medium italic text-lg">"Transforming 128 N Osborn from a listing into a high-velocity digital asset."</p>
+                    </div>
+
+                    <!-- Professional Media Tier: Action Cards -->
+                    <div class="mb-20">
+                        <h3 class="text-xs font-black text-blue-900 uppercase tracking-[0.3em] mb-8 text-center font-montserrat">Executive Media Suite</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <!-- 3D Immersion -->
+                            <div class="bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-800 text-center relative overflow-hidden group">
+                                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="relative z-10">
+                                    <div class="text-5xl mb-6">🏠</div>
+                                    <h4 class="text-xl font-black text-white uppercase mb-3 font-montserrat">3D Immersion</h4>
+                                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                        Matterport virtual walkthrough technology capturing 100% of the asset for 24/7 global access.
+                                    </p>
+                                    <div class="relative w-full overflow-hidden rounded-xl mb-6 shadow-2xl bg-slate-900" style="aspect-ratio: 16/9;">
+                                        <iframe width="100%" height="100%" src="https://www.propertypanorama.com/instaview-tour/ntreis/20991647" frameborder="0" allowfullscreen allow="xr-spatial-tracking" class="absolute top-0 left-0 w-full h-full"></iframe>
+                                    </div>
+                                    <a href="https://www.propertypanorama.com/instaview-tour/ntreis/20991647" target="_blank" class="inline-block px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest hover:bg-blue-700 transition-all">View 3D Showcase</a>
+                                </div>
+                            </div>
+
+                            <!-- Aerial Intel -->
+                            <div class="bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-800 text-center relative overflow-hidden group">
+                                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="relative z-10">
+                                    <div class="text-5xl mb-6">🚁</div>
+                                    <h4 class="text-xl font-black text-white uppercase mb-3 font-montserrat">Aerial Intel</h4>
+                                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                        High-altitude drone videography highlighting the 0.48 AC lot and proximity to Lake Fork.
+                                    </p>
+                                    <a href="https://drive.google.com/file/d/103RUPsc2FisX0nT_Ow9dRfEp10_YMuUq/view?usp=sharing" target="_blank" class="inline-block px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest hover:bg-blue-700 transition-all">Watch Drone Video</a>
+                                </div>
+                            </div>
+
+                            <!-- HDR Mastery -->
+                            <div class="bg-slate-900 rounded-[2rem] p-8 shadow-2xl border border-slate-800 text-center relative overflow-hidden group">
+                                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-600/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+                                <div class="relative z-10">
+                                    <div class="text-5xl mb-6">📸</div>
+                                    <h4 class="text-xl font-black text-white uppercase mb-3 font-montserrat">HDR Mastery</h4>
+                                    <p class="text-slate-400 text-sm leading-relaxed mb-6">
+                                        Professional High Dynamic Range photography to showcase the 2025 modernization in perfection.
+                                    </p>
+                                    <a href="https://drive.google.com/file/d/1wVAiKQyh_OKK4RccwIYvG9Rm2DhnQe-u/view" target="_blank" class="inline-block px-4 py-1.5 bg-blue-600 text-white text-[10px] font-black rounded-full uppercase tracking-widest hover:bg-blue-700 transition-all">View HDR Gallery</a>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Video Marketing Link -->
+                        <div class="mt-8 text-center">
+                            <a href="https://youtu.be/fj_mo819gi0" target="_blank" class="text-blue-600 font-black uppercase text-xs tracking-widest hover:text-blue-800 transition-colors font-montserrat">
+                                🎬 View TGR Video Marketing Compilation
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- The Syndication Power-House -->
+                    <div class="bg-white rounded-3xl border border-slate-200 p-12 mb-16 shadow-sm text-center">
+                        <h3 class="text-xl font-black text-blue-900 uppercase tracking-tight mb-4 font-montserrat mx-auto">Global Distribution Network</h3>
+                        <div class="section-underline mx-auto"></div>
+                        <p class="text-xl font-bold text-slate-700 max-w-3xl mx-auto leading-relaxed mb-8">
+                            Your property is syndicated to over <span class="text-blue-600 font-black">900+ real estate portals worldwide</span>, including Zillow, Realtor.com, Trulia, and Redfin.
+                        </p>
+                        <p class="text-sm text-slate-500 font-medium italic">
+                            * Assets are also pushed to <strong class="text-slate-800">Property Panorama</strong> to create a custom, high-engagement virtual tour experience for every syndication channel.
+                        </p>
+                    </div>
+
+                    <!-- Social Media Acceleration -->
+                    <div class="bg-blue-50 rounded-3xl border border-blue-100 p-12 mb-16 relative overflow-hidden">
+                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-200/30 rounded-full"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row items-center gap-12">
+                            <div class="md:w-1/3 text-center md:text-left">
+                                <div class="inline-block p-4 bg-blue-600 text-white rounded-2xl shadow-xl mb-6">🚀</div>
+                                <h3 class="text-2xl font-black text-blue-900 uppercase font-montserrat mb-2">Social Acceleration</h3>
+                                <p class="text-blue-600 font-black text-xs uppercase tracking-widest">Paid Placement Engine</p>
+                            </div>
+                            <div class="md:w-2/3">
+                                <p class="text-slate-700 text-lg font-medium leading-relaxed mb-6">
+                                    We deploy high-intensity <strong class="text-slate-900">Social Media Paid Promotion</strong> and <strong class="text-slate-900">Listing Rocket</strong> campaigns on Facebook and Instagram, specifically engineered to trigger buyer engagement.
+                                </p>
+                                <div class="flex flex-wrap gap-4">
+                                    <a href="https://www.facebook.com/share/v/16sQ7Z1QMk/" target="_blank" class="px-4 py-2 bg-white border border-blue-200 rounded-xl text-xs font-black text-blue-600 uppercase tracking-widest hover:bg-blue-50 transition-all font-montserrat">
+                                        Live Facebook/IG Reel Example
+                                    </a>
+                                    <a href="#" target="_blank" class="px-4 py-2 bg-white border border-blue-200 rounded-xl text-xs font-black text-blue-600 uppercase tracking-widest hover:bg-blue-50 transition-all font-montserrat">
+                                        Sample YouTube Short
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Transparency Dashboard: Live Reporting -->
+                    <div class="bg-slate-900 text-white rounded-[3rem] p-12 shadow-3xl relative overflow-hidden">
+                        <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-blue-600/10 rounded-full"></div>
+                        <div class="relative z-10 text-center">
+                            <h3 class="text-3xl font-black uppercase mb-6 font-montserrat">Transparency Reporting</h3>
+                            <p class="text-slate-400 text-lg max-w-2xl mx-auto font-medium mb-10 italic">
+                                "Most agents list and hope. We list and analyze. Every week, your dashboard is updated with live traffic data so we can pivot our strategy in real-time based on actual buyer behavior."
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
+                                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 flex flex-col items-center">
+                                    <span class="text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4 font-montserrat">Traffic Performance</span>
+                                    <div class="flex gap-4">
+                                        <a href="https://drive.google.com/file/d/14fAhNT0vbhphNaCmw0mtBLBKMnnJ8uMw/view?usp=drive_link" target="_blank" class="px-6 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all font-montserrat">Sample Zillow Report</a>
+                                        <a href="https://drive.google.com/file/d/18pcSMos0ZgbJ3Skztsb82aeTquM64Gb7/view?usp=drive_link" target="_blank" class="px-6 py-3 bg-blue-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-700 transition-all font-montserrat">Sample Realtor.com Report</a>
+                                    </div>
+                                </div>
+                                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 flex flex-col items-center">
+                                    <span class="text-blue-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4 font-montserrat">Campaign Intelligence</span>
+                                    <a href="#" target="_blank" class="px-8 py-3 border-2 border-slate-600 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-all font-montserrat">
+                                        View Executive Summary Example
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-center">
+                                <a href="#" class="py-4 px-10 border border-slate-700 text-slate-500 rounded-xl font-black uppercase tracking-widest hover:text-white transition-all cursor-not-allowed font-montserrat">
+                                    View Live Showing Feedback
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-option2" class="tab-pane hidden">
+                <div class="page-section max-w-5xl mx-auto">
+                    <!-- Header Box -->
+                    <div class="bg-green-50 border-l-8 border-green-500 p-8 rounded-r-2xl mb-10">
+                        <h2 class="text-3xl font-black text-green-800 uppercase italic mb-2">3-2-1 Interest Rate Buydown</h2>
+                        <p class="text-green-700 font-bold leading-relaxed">
+                            "The ultimate incentive for monthly-payment sensitive buyers. Seller credits are used to subsidize the first 3 years of interest, creating a massive entry-level savings window."
+                        </p>
+                    </div>
+
+                    <!-- Financial Split-Pane -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <!-- Left Card: Seller Financial Details -->
+                        <div class="bg-white p-6 rounded-2xl border-2 border-slate-100 shadow-sm relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50 rounded-full opacity-50"></div>
+                            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 relative">Seller Financial Details</h3>
+                            <div class="space-y-4 relative">
+                                <div class="flex justify-between border-b pb-2">
+                                    <span class="text-slate-500">Sales Price</span>
+                                    <span id="buydown-seller-price" class="font-bold">$349,999</span>
+                                </div>
+                                <div class="flex justify-between border-b pb-2">
+                                    <span class="text-slate-500">Buydown Strategy</span>
+                                    <span class="font-bold">3-2-1 Fixed</span>
+                                </div>
+                                <div class="flex justify-between pt-2">
+                                    <span class="text-red-600 font-black uppercase text-xs">Total Contribution</span>
+                                    <span id="buydown-seller-contribution" class="text-red-600 font-black text-xl">-$24,150</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Card: Buyer Loan Terms -->
+                        <div class="bg-white p-6 rounded-2xl border-2 border-blue-50 shadow-sm relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full opacity-50"></div>
+                            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 relative">Buyer Loan Terms</h3>
+                            <div class="space-y-4 relative">
+                                <div class="flex justify-between border-b pb-2">
+                                    <span class="text-slate-500">Down Payment (20%)</span>
+                                    <span id="buydown-buyer-down" class="font-bold text-blue-600">$70,000</span>
+                                </div>
+                                <div class="flex justify-between border-b pb-2">
+                                    <span class="text-slate-500">Loan Amount</span>
+                                    <span id="buydown-buyer-loan" class="font-bold">$279,999</span>
+                                </div>
+                                <div class="flex justify-between pt-2">
+                                    <span class="text-slate-500">Fully Indexed Rate</span>
+                                    <span id="buydown-buyer-rate" class="font-black text-slate-800">6.45%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- The Savings Table -->
+                    <div class="bg-white rounded-2xl border border-green-100 shadow-inner overflow-hidden mb-12">
+                        <table class="w-full text-left">
+                            <thead class="bg-green-100 text-green-800 uppercase text-[10px] font-black tracking-widest">
+                                <tr>
+                                    <th class="px-6 py-4 text-center">Period</th>
+                                    <th class="px-6 py-4 text-center">Interest Rate</th>
+                                    <th class="px-6 py-4 text-center">Est. Monthly P&I</th>
+                                    <th class="px-6 py-4 text-right">Monthly Savings</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                <tr class="bg-green-50/50">
+                                    <td class="px-6 py-4 font-bold text-center">Year 1</td>
+                                    <td id="buydown-y1-rate" class="px-6 py-4 text-center font-black text-green-600 text-lg">3.11%</td>
+                                    <td id="buydown-y1-pay" class="px-6 py-4 text-center font-black text-green-700 text-lg">$1,539</td>
+                                    <td id="buydown-y1-save" class="px-6 py-4 text-right font-bold text-green-600">-$728 / mo</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-center text-slate-600">Year 2</td>
+                                    <td id="buydown-y2-rate" class="px-6 py-4 text-center text-slate-800 font-bold">4.11%</td>
+                                    <td id="buydown-y2-pay" class="px-6 py-4 text-center text-slate-800 font-bold">$1,741</td>
+                                    <td id="buydown-y2-save" class="px-6 py-4 text-right text-slate-500">-$526 / mo</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 font-bold text-center text-slate-600">Year 3</td>
+                                    <td id="buydown-y3-rate" class="px-6 py-4 text-center text-slate-800 font-bold">5.11%</td>
+                                    <td id="buydown-y3-pay" class="px-6 py-4 text-center text-slate-800 font-bold">$1,957</td>
+                                    <td id="buydown-y3-save" class="px-6 py-4 text-right text-slate-500">-$310 / mo</td>
+                                </tr>
+                                <tr class="bg-slate-50">
+                                    <td class="px-6 py-4 font-bold text-center text-slate-400">Years 4-30</td>
+                                    <td id="buydown-y4-rate" class="px-6 py-4 text-center text-slate-500 font-medium">6.45%</td>
+                                    <td id="buydown-y4-pay" class="px-6 py-4 text-center text-slate-800 font-black">$2,267</td>
+                                    <td class="px-6 py-4 text-right text-slate-400">Final Fixed Rate</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-option3" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">Strategic Carry Portfolio Model</h2>
+                        <p class="text-slate-500 font-medium italic">"Leveraging the 7-Year Wrap structure to capture Non-QM premiums and maximize total asset revenue."</p>
+                    </div>
+
+                    <!-- Global Constants / Baseline -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Subject Asset Price</span>
+                                <span class="text-2xl font-black text-slate-900">$349,999</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Standard Liquidation</span>
+                                <span class="text-xl font-bold text-slate-500">$318,499</span>
+                                <p class="text-[9px] text-slate-400 mt-1 uppercase font-bold">(Price minus 9% Fees)</p>
+                            </div>
+                        </div>
+                        <div class="bg-blue-900 text-white p-6 rounded-2xl shadow-xl flex items-center justify-between border-l-8 border-blue-400">
+                            <div>
+                                <span class="text-[10px] font-black text-blue-300 uppercase tracking-widest block mb-1">Strategic Wealth Multiple</span>
+                                <span class="text-3xl font-black text-white">1.56x</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] font-black text-blue-300 uppercase tracking-widest block mb-1">Portfolio Advantage</span>
+                                <span class="text-xl font-bold text-blue-400">+$177,911</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dual-Tier Comparison Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                        <!-- Tier 1: The Leveraged Entry -->
+                        <div class="page-section border-t-8 border-blue-500 flex flex-col h-full hover:scale-[1.02] transition-transform duration-300">
+                            <div class="mb-6">
+                                <span class="px-3 py-1 bg-blue-100 text-blue-700 text-[10px] font-black rounded-full uppercase tracking-widest">Tier 1</span>
+                                <h4 class="text-xl font-black text-slate-800 uppercase mt-4">The Leveraged Entry</h4>
+                                <p class="text-xs font-bold text-slate-400">10% Down Payment Strategy</p>
+                            </div>
+                            
+                            <div class="space-y-6 flex-grow">
+                                <div class="flex justify-between items-end border-b border-slate-50 pb-4">
+                                    <div>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Down Payment</span>
+                                        <span class="text-3xl font-black text-slate-900">$35,000</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Interest Rate</span>
+                                        <span class="text-2xl font-black text-blue-600">8.0%</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Monthly Cash Flow (P&I)</span>
+                                    <span class="text-xl font-black text-slate-900">$2,311.41</span>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500 font-medium">7-Year Total Revenue</span>
+                                        <span class="font-black text-slate-900">$496,410</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500 font-medium">Strategic Alpha</span>
+                                        <span class="font-black text-green-600">+$177,911</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tier 2: The Stable Yield -->
+                        <div class="page-section border-t-8 border-green-500 flex flex-col h-full hover:scale-[1.02] transition-transform duration-300">
+                            <div class="mb-6">
+                                <span class="px-3 py-1 bg-green-100 text-green-700 text-[10px] font-black rounded-full uppercase tracking-widest">Tier 2</span>
+                                <h4 class="text-xl font-black text-slate-800 uppercase mt-4">The Stable Yield</h4>
+                                <p class="text-xs font-bold text-slate-400">20% Down Payment Strategy</p>
+                            </div>
+                            
+                            <div class="space-y-6 flex-grow">
+                                <div class="flex justify-between items-end border-b border-slate-50 pb-4">
+                                    <div>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Down Payment</span>
+                                        <span class="text-3xl font-black text-slate-900">$70,000</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">Interest Rate</span>
+                                        <span class="text-2xl font-black text-green-600">6.5%</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 p-4 rounded-xl flex justify-between items-center">
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Monthly Cash Flow (P&I)</span>
+                                    <span class="text-xl font-black text-slate-900">$1,769.79</span>
+                                </div>
+
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500 font-medium">7-Year Total Revenue</span>
+                                        <span class="font-black text-slate-900">$488,662</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-500 font-medium">Strategic Alpha</span>
+                                        <span class="font-black text-green-600">+$170,163</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Strategic Conclusion -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div class="page-section border-l-8 border-blue-600 bg-slate-900 text-white">
+                            <h3 class="text-xl font-black text-blue-400 uppercase mb-4">The Wealth Multiple Advantage</h3>
+                            <p class="text-sm text-slate-300 leading-relaxed">
+                                By transitioning from a standard liquidation to a <strong>7-Year Strategic Carry</strong>, the owner captures a <strong class="text-white text-lg">1.56x Wealth Multiple</strong> on the asset. This strategy leverages current market friction to generate institutional-grade yields while maintaining first-lien security on the residence.
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-center p-8 bg-blue-50 rounded-2xl border-2 border-dashed border-blue-200">
+                            <p class="text-sm text-blue-800 font-bold text-center italic leading-relaxed">
+                                "The monthly cash flow ($1,769 - $2,311) provides a consistent yield premium over standard market exits, effectively 'becoming the bank' in a tightening credit environment."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Legal & Logic Footnotes -->
+                    <div class="text-center pb-10 space-y-2">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                            * Interest rates reflect current market (6.11%) rounded to the nearest 0.5% with applicable risk premiums.
+                        </p>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">
+                            * Estimated figures. Subject to TREC Seller Financing Addendum and Dodd-Frank compliance.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div id="tab-rpr" class="tab-pane hidden">
+                <div class="max-w-6xl mx-auto px-4">
+                    <div class="text-center mb-12">
+                        <h2 class="text-3xl font-black text-slate-800 uppercase tracking-tight mb-2">Realtors Property Resource® (RPR) Insights</h2>
+                        <p class="text-slate-500 font-medium italic">"Deep-dive market metrics and valuation benchmarks for Alba, TX 75410."</p>
+                    </div>
+
+                    <!-- Market Stats (3-Card Row) -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                        <div class="kpi-card border-blue-600">
+                            <span class="kpi-title">Market Value Benchmark</span>
+                            <span class="kpi-value">$313,744</span>
+                            <span class="kpi-subtext text-blue-600">Area Median Value</span>
+                        </div>
+                        <div class="kpi-card border-slate-800">
+                            <span class="kpi-title">Supply Level</span>
+                            <span class="kpi-value">3.2 Months</span>
+                            <span class="kpi-subtext text-slate-400">Balanced Market Status</span>
+                        </div>
+                        <div class="kpi-card border-orange-600">
+                            <span class="kpi-title">Median DOM</span>
+                            <span class="kpi-value">42 Days</span>
+                            <span class="kpi-subtext text-orange-600">Velocity Baseline</span>
+                        </div>
+                    </div>
+
+                    <!-- Analysis & Link Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+                        <!-- Left Column: Expert Analysis -->
+                        <div class="space-y-4">
+                            <h3 class="section-header">Expert Analysis</h3>
+                            <div class="section-underline"></div>
+                            <div class="page-section bg-slate-50 border-l-8 border-slate-800">
+                                <p class="text-slate-700 leading-relaxed font-bold">
+                                    While the $349,999 entry price reflects the property’s unique "Like-New" status and 1,700 SF expansion, the $309k-$325k bracket represents the peak appraisal-supported volume for the Alba town center. This roadmap is designed to test the ceiling while protecting the asset from market stagnation.
+                                </p>
+                            </div>
+                            <p class="text-slate-600 text-sm leading-relaxed">
+                                RPR® metrics confirm that while the area median remains near $314k, the luxury-renovation tier (1,500+ SF) is currently outperforming the general market in both retention of value and days-on-market velocity.
+                            </p>
+                        </div>
+
+                        <!-- Right Column: External Link Button -->
+                        <div class="flex flex-col justify-center items-center space-y-6">
+                            <div class="bg-blue-50 p-8 rounded-3xl border border-blue-100 text-center w-full">
+                                <div class="text-4xl mb-4">📄</div>
+                                <h4 class="text-lg font-black text-slate-800 uppercase mb-2">Full RPR Analysis</h4>
+                                <p class="text-slate-500 text-sm mb-6">Access the complete property report, including historical tax records and detailed neighborhood mapping.</p>
+                                <a href="https://www.narrpr.com/reports-v2/3301b700-8b0c-4530-b17b-bb435cf9abb8/pdf" target="_blank" class="block w-full py-5 bg-slate-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl border-b-4 border-slate-950 active:border-b-0 active:translate-y-1">
+                                    View Full RPR Market Report
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Properties Tab -->
+            <div id="tab-search" class="tab-pane hidden">
+                <div class="max-w-4xl mx-auto px-4 py-12">
+                    <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden">
+                        <div class="bg-slate-900 p-12 text-center relative overflow-hidden">
+                            <!-- Background Decor -->
+                            <div class="absolute top-0 right-0 p-10 opacity-10">
+                                <svg class="w-32 h-32 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h14v-8h3L12 2zm0 4.7l6 5.4V18H6v-4.9l6-5.4z"/></svg>
+                            </div>
+                            
+                            <div class="relative z-10">
+                                <h2 class="text-4xl font-black text-white uppercase tracking-tight mb-4 font-montserrat">Expand Your Search</h2>
+                                <p class="text-blue-300 font-bold text-lg mb-8 max-w-2xl mx-auto">
+                                    Access the full Texas Grand Realty database for Alba, Lake Fork, and the surrounding regions.
+                                </p>
+                                <a href="https://www.texasgrandrealty.com/" target="_blank" class="inline-block py-5 px-12 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl border-b-4 border-blue-800 active:border-b-0 active:translate-y-1">
+                                    Launch Property Search
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-12 border-t border-slate-200 text-slate-500 text-[12px] font-medium leading-relaxed">
+            <div class="max-w-4xl mx-auto px-4">
+                Data sourced from RPR, Wood County CAD, and surrounding MLS systems. Thomas Miller, Broker, Texas Grand Realty TX Brk. Lic. No. 696139, AZ Brk. Lic. No. BR604504, Lender, Peoples Mortgage, NMLS ID: 2360948.
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            syncPropertyData();
+            const lastRunElement = document.getElementById('lastRun');
+            if (lastRunElement) {
+                const now = new Date();
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                const formattedDate = now.toLocaleDateString('en-US', options).toUpperCase();
+                lastRunElement.innerText = `REPORT LAST RUN: ${formattedDate}`;
+            }
+        });
+
+        function syncPropertyData() {
+            // Header
+            const hAddr = document.getElementById('header-address');
+            if(hAddr) hAddr.innerText = propertyData.address;
+            
+            const hYear = document.getElementById('header-year');
+            if(hYear) hYear.innerText = propertyData.yearBuilt;
+            
+            const hSqft = document.getElementById('header-sqft');
+            if(hSqft) hSqft.innerText = fNumber(propertyData.sqft) + " SF";
+            
+            const hBeds = document.getElementById('header-beds');
+            if(hBeds) hBeds.innerText = propertyData.beds;
+            
+            const hBaths = document.getElementById('header-baths');
+            if(hBaths) hBaths.innerText = propertyData.baths;
+            
+            const hLot = document.getElementById('header-lot');
+            if(hLot) hLot.innerText = propertyData.lotSize;
+
+            // Summary Tab
+            const introVideo = document.getElementById('intro-video');
+            if(introVideo) introVideo.src = `https://www.youtube-nocookie.com/embed/${propertyData.introVideoID}?rel=0&modestbranding=1&enablejsapi=1&origin=${window.location.origin}`;
+            
+            const sPrice = document.getElementById('summary-price');
+            if(sPrice) sPrice.innerText = fCurrency(propertyData.price);
+            
+            const sPpsf = document.getElementById('summary-ppsf');
+            if(sPpsf) sPpsf.innerText = fCurrency(Math.round(propertyData.price / propertyData.sqft)) + " / SqFt";
+            
+            const sImg = document.getElementById('summary-image');
+            if(sImg) sImg.src = propertyData.imagePath;
+            
+            const sSurge = document.getElementById('summary-surge-pct');
+            if(sSurge) sSurge.innerText = propertyData.localMarket.inventoryYoY + "%";
+
+            // Metrics Tab
+            const mPrice = document.getElementById('metrics-initial-price');
+            if(mPrice) mPrice.innerText = fCurrency(propertyData.price);
+            
+            const mPpsf = document.getElementById('metrics-ppsf');
+            if(mPpsf) mPpsf.innerText = fCurrencyPrecise(propertyData.pps);
+
+            // Roadmap Tab
+            document.getElementById('roadmap-p1-price').innerText = fCurrency(propertyData.roadmap.phase1);
+            document.getElementById('roadmap-p2-price').innerText = fCurrency(propertyData.roadmap.phase2);
+            document.getElementById('roadmap-p3-price').innerText = fCurrency(propertyData.roadmap.phase3);
+            document.getElementById('roadmap-table-p1-price').innerText = fCurrency(propertyData.roadmap.phase1);
+            document.getElementById('roadmap-table-p2-price').innerText = fCurrency(propertyData.roadmap.phase2);
+            document.getElementById('roadmap-table-p3-price').innerText = fCurrency(propertyData.roadmap.phase3);
+            document.getElementById('roadmap-table-p1-ppsf').innerText = fCurrencyPrecise(propertyData.roadmap.phase1 / propertyData.sqft);
+            document.getElementById('roadmap-table-p2-ppsf').innerText = fCurrencyPrecise(propertyData.roadmap.phase2 / propertyData.sqft);
+            document.getElementById('roadmap-table-p3-ppsf').innerText = fCurrencyPrecise(propertyData.roadmap.phase3 / propertyData.sqft);
+
+            // Buydown Tab
+            document.getElementById('buydown-seller-price').innerText = fCurrency(propertyData.price);
+            document.getElementById('buydown-seller-contribution').innerText = "-" + fCurrency(propertyData.buydown.contribution);
+            document.getElementById('buydown-buyer-down').innerText = fCurrency(propertyData.buydown.downPayment);
+            document.getElementById('buydown-buyer-loan').innerText = fCurrency(propertyData.buydown.loanAmount);
+            document.getElementById('buydown-buyer-rate').innerText = fRate(propertyData.buydown.indexedRate);
+            document.getElementById('buydown-y1-rate').innerText = fRate(propertyData.buydown.year1.rate);
+            document.getElementById('buydown-y1-pay').innerText = fCurrency(propertyData.buydown.year1.pay);
+            document.getElementById('buydown-y1-save').innerText = "-" + fCurrency(propertyData.buydown.year1.save) + " / mo";
+            document.getElementById('buydown-y2-rate').innerText = fRate(propertyData.buydown.year2.rate);
+            document.getElementById('buydown-y2-pay').innerText = fCurrency(propertyData.buydown.year2.pay);
+            document.getElementById('buydown-y2-save').innerText = "-" + fCurrency(propertyData.buydown.year2.save) + " / mo";
+            document.getElementById('buydown-y3-rate').innerText = fRate(propertyData.buydown.year3.rate);
+            document.getElementById('buydown-y3-pay').innerText = fCurrency(propertyData.buydown.year3.pay);
+            document.getElementById('buydown-y3-save').innerText = "-" + fCurrency(propertyData.buydown.year3.save) + " / mo";
+            document.getElementById('buydown-y4-rate').innerText = fRate(propertyData.buydown.indexedRate);
+            document.getElementById('buydown-y4-pay').innerText = fCurrency(propertyData.buydown.final.pay);
+
+            // Incentives Matrix
+            document.getElementById('matrix-o1-price').innerText = fCurrency(propertyData.roadmap.phase3);
+            document.getElementById('matrix-o1-impact').innerText = "-" + fCurrency(propertyData.price - propertyData.roadmap.phase3);
+            document.getElementById('matrix-o1-pay').innerText = fCurrency(2185) + "/mo"; // Placeholder for reduction calc
+            document.getElementById('matrix-o2-rate').innerText = fRate(propertyData.buydown.year1.rate);
+            document.getElementById('matrix-o2-impact').innerText = "-" + fCurrency(propertyData.buydown.contribution);
+            document.getElementById('matrix-o2-savings').innerText = fCurrency((propertyData.price - propertyData.roadmap.phase3) - propertyData.buydown.contribution);
+            document.getElementById('matrix-o2-pay').innerText = fCurrency(propertyData.buydown.year1.pay) + "/mo";
+            document.getElementById('matrix-o3-pay').innerText = fCurrency(propertyData.ownerFinance.monthlyPay) + "/mo";
+            document.getElementById('matrix-analysis-savings').innerText = fCurrency(propertyData.buydown.year1.save) + "/mo";
+            document.getElementById('matrix-analysis-equity').innerText = fCurrency((propertyData.price - propertyData.roadmap.phase3) - propertyData.buydown.contribution);
+
+            // Market Rates Tab
+            const mr = propertyData.marketRates;
+            document.getElementById('rates-range').innerText = `${fRate(mr.rangeLow)} - ${fRate(mr.rangeHigh)}`;
+            document.getElementById('rates-fed-prob').innerText = fRate(mr.fedCutProb);
+            document.getElementById('rates-unemployment').innerText = fRate(mr.unemployment);
+            document.getElementById('rates-adp').innerText = mr.adp;
+
+            // Local Market Tab Logic
+            const lm = propertyData.localMarket;
+            
+            const updateLM = (id, data, formatFn, inverseTrend = false) => {
+                const el = document.getElementById(id);
+                const subEl = document.getElementById(id + '-sub');
+                if (el) el.innerText = formatFn ? formatFn(data.value) : data.value;
+                if (subEl) {
+                    subEl.innerText = data.change || '';
+                    if (data.trend) {
+                        const isGood = inverseTrend ? data.trend === 'down' : data.trend === 'up';
+                        subEl.className = `kpi-subtext ${isGood ? 'text-green-600' : 'text-red-500'}`;
+                        const arrow = data.trend === 'up' ? '↑' : '↓';
+                        subEl.innerText = arrow + " " + subEl.innerText;
+                    }
+                }
+            };
+
+            updateLM('local-median-price', lm.medianListPrice, fCurrency);
+            updateLM('local-months-supply', lm.monthsSupply, (v) => v);
+            document.getElementById('local-months-supply-sub').innerText = lm.monthsSupply.status;
+            updateLM('local-median-dom', lm.medianDOM, (v) => v + " Days", true); // Down is good for DOM
+            updateLM('local-ppsf', lm.ppsf, fCurrency, false); // Up is good for PPSF
+            
+            updateLM('local-active-listings', lm.activeListings, (v) => v);
+            updateLM('local-new-listings', lm.newListings, (v) => v);
+            updateLM('local-pending-listings', lm.pendingListings, (v) => v);
+            
+            document.getElementById('local-median-size').innerText = fNumber(lm.medianHomeSize) + " SqFt";
+            document.getElementById('local-asset-size').innerText = fNumber(propertyData.sqft) + " SqFt";
+
+            // Liquidity Tab
+            document.getElementById('liq-inventory-yoy').innerText = propertyData.localMarket.inventoryYoY + "%";
+            document.getElementById('liq-area-supply').innerText = propertyData.localMarket.areaSupply;
+
+            // Comps Tab
+            const addr = "SUBJECT: " + propertyData.address.split('|')[0].trim();
+            for(let i=1; i<=3; i++) {
+                if(document.getElementById(`comp-subject-address-${i}`)) document.getElementById(`comp-subject-address-${i}`).innerText = addr;
+                if(document.getElementById(`comp-subject-sqft-${i}`)) document.getElementById(`comp-subject-sqft-${i}`).innerText = fNumber(propertyData.sqft);
+                if(document.getElementById(`comp-subject-price-${i}`)) document.getElementById(`comp-subject-price-${i}`).innerText = fCurrency(propertyData.price);
+                if(document.getElementById(`comp-subject-ppsf-${i}`)) document.getElementById(`comp-subject-ppsf-${i}`).innerText = fCurrencyPrecise(propertyData.pps);
+                if(document.getElementById(`comp-subject-year-${i}`)) document.getElementById(`comp-subject-year-${i}`).innerText = propertyData.yearBuilt.split('/')[0];
+            }
+        }
+
+        function showTab(tabId) {
+            // SCROLL TO TOP
+            window.scrollTo(0, 0);
+
+            // 1. HIDE ALL PANES
+            const panes = document.querySelectorAll('.tab-pane');
+            panes.forEach(pane => {
+                pane.classList.add('hidden');
+            });
+
+            // 2. SHOW SELECTED PANE
+            const activePane = document.getElementById('tab-' + tabId);
+            if (activePane) {
+                activePane.classList.remove('hidden');
+            }
+
+            // 3. RESET BUTTONS
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // 4. ACTIVATE CLICKED BUTTON
+            const activeBtn = document.getElementById('btn-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // 5. RUN DATA LOGIC
+            if(tabId === 'metrics') renderPriceChart();
+            if(tabId === 'local') initLocalMarketChart();
+            if(tabId === 'liquidity') initCDOMChart();
+            if(tabId === 'rates') initMarketChart();
+            if(tabId === 'campaign') {
+                // Any specific campaign init logic if needed
+                console.log('Campaign tab activated');
+            }
+        }
+
+        function showSubTab(parentTabId, subTabId) {
+            // 1. Hide all sub-panes in the parent
+            const parent = document.getElementById('tab-' + parentTabId);
+            const subPanes = parent.querySelectorAll('.sub-tab-pane');
+            subPanes.forEach(pane => pane.classList.add('hidden'));
+
+            // 2. Show selected sub-pane
+            const targetPane = document.getElementById('sub-' + subTabId);
+            if (targetPane) targetPane.classList.remove('hidden');
+
+            // 3. Reset sub-nav buttons
+            const subButtons = parent.querySelectorAll('.sub-nav-btn');
+            subButtons.forEach(btn => btn.classList.remove('active'));
+
+            // 4. Activate current sub-button by matching the onclick call
+            subButtons.forEach(btn => {
+                if (btn.getAttribute('onclick').includes(`'${subTabId}'`)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        let pChart, cChart, rChart, lChart;
+        function renderPriceChart() {
+            const ctx = document.getElementById('priceChart').getContext('2d');
+            if(pChart) pChart.destroy();
+            pChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Launch', 'D30', 'D60', 'D90'],
+                    datasets: [{ label: 'Price Velocity', data: [propertyData.roadmap.phase1, propertyData.roadmap.d30, propertyData.roadmap.d60, propertyData.roadmap.phase3], borderColor: '#1D4ED8', fill: true, tension: 0.1, backgroundColor: 'rgba(29, 78, 216, 0.05)' }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
+        function initLocalMarketChart() {
+            // Replaced with custom HTML/CSS bars in tab-local for better presentation control
+        }
+
+        function initMarketChart() {
+            const ctx = document.getElementById('rateChart').getContext('2d');
+            if(rChart) rChart.destroy();
+            const mr = propertyData.marketRates;
+            rChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Sep 2025', 'Oct 2025', 'Nov 2025', 'Dec 2025', 'Jan 16, 2026'],
+                    datasets: [{
+                        label: '30-Year Fixed Rate (%)',
+                        data: [6.38, 6.25, 6.30, parseRate(mr.rangeLow), parseRate(mr.current)],
+                        borderColor: '#1D4ED8',
+                        backgroundColor: 'rgba(29, 78, 216, 0.1)',
+                        fill: false,
+                        tension: 0.1,
+                        borderWidth: 4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#1D4ED8',
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        annotation: {
+                            annotations: {
+                                rangeBox: {
+                                    type: 'box',
+                                    yMin: parseRate(mr.rangeLow),
+                                    yMax: parseRate(mr.rangeHigh),
+                                    backgroundColor: 'rgba(100, 116, 139, 0.1)',
+                                    borderColor: 'transparent',
+                                    label: {
+                                        display: true,
+                                        content: `Old 4-Month Range (${fRate(mr.rangeLow)} - ${fRate(mr.rangeHigh)})`,
+                                        position: 'start',
+                                        color: '#64748b',
+                                        font: { size: 10, weight: 'bold' }
+                                    }
+                                },
+                                breakoutLabel: {
+                                    type: 'label',
+                                    xValue: 'Jan 16, 2026',
+                                    yValue: parseRate(mr.current),
+                                    backgroundColor: '#1D4ED8',
+                                    color: 'white',
+                                    content: ['GSE Policy Breakout', `3 Year Low: ${fRate(mr.current)}`],
+                                    font: { size: 12, weight: 'bold' },
+                                    padding: 8,
+                                    borderRadius: 6,
+                                    position: 'bottom',
+                                    yAdjust: 40
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 5.5,
+                            max: 7.0,
+                            ticks: { 
+                                stepSize: 0.25,
+                                callback: function(value) { return value.toFixed(2) + '%'; },
+                                font: { weight: 'bold' }
+                            },
+                            grid: { color: '#f1f5f9' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initCDOMChart() {
+            const ctx = document.getElementById('cdomChart').getContext('2d');
+            if(cChart) cChart.destroy();
+            cChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['75410 Median', 'Regional High-End', '128 N Osborn Target'],
+                    datasets: [{ 
+                        label: 'Days on Market', 
+                        data: [86, 110, 45], 
+                        backgroundColor: ['#94a3b8', '#dc2626', '#16a34a'],
+                        borderRadius: 8,
+                        barThickness: 60
+                    }]
+                },
+                options: { 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { font: { weight: 'bold' } },
+                            title: { display: true, text: 'Days', font: { weight: 'black' } }
+                        },
+                        x: {
+                            ticks: { font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
